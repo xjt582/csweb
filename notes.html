@@ -1,46 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <meta charset="utf-8">
-    <title>项目中心 · Notes</title>
-    <link rel="stylesheet" href="md/page.css">
+    <meta charset="UTF-8">
+    <title>笔记中心</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+        nav {
+            background: #333;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        nav a {
+            color: #fff;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+        nav a:hover { text-decoration: underline; }
+        .card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .card h3 { margin: 0 0 10px 0; }
+    </style>
 </head>
 <body>
 
-<header>
-    <nav>
-        <a href="/">首页</a>
-        <a href="notes.html">项目集</a>
-    </nav>
-</header>
+<nav>
+    <a href="index.html">首页</a>
+    <a href="notes.html">笔记中心</a>
+    <a href="project1.html">项目一</a>
+    <a href="project2.html">项目二</a>
+    <a href="project3.html">项目三</a>
+</nav>
 
-<div class="container">
-    <h1>🚀 项目中心 Project Showcase</h1>
+<h2>📘 项目笔记目录</h2>
 
-    <div class="project-card">
-        <h2>杂记</h2>
-        <p>一些随笔，不建议看</p>
-        <a href="project0.html">进入项目 →</a>
-    </div>
+<div class="card">
+    <h3>杂记</h3>
+    <p>一些随笔，吐槽</p>
+    <a href="project0.html">→ 查看随笔</a>
+</div>
 
-    <div class="project-card">
-        <h2>项目一：轻量级服务器性能监控看板</h2>
-        <p>Python 自动化监控 · 数据采集 · 可视化</p>
-        <a href="project1.html">进入项目 →</a>
-    </div>
+<div class="card">
+    <h3>项目一：服务器性能监控看板</h3>
+    <p>Python + Flask + MySQL + ECharts 的完整监控平台。</p>
+    <a href="project1.html">→ 查看项目笔记</a>
+</div>
 
-    <div class="project-card">
-        <h2>项目二：LNMP 微服务自动化部署与高可用</h2>
-        <p>Docker · Compose · Ansible · 现代运维</p>
-        <a href="project2.html">进入项目 →</a>
-    </div>
+<div class="card">
+    <h3>项目二：LNMP 微服务自动化部署</h3>
+    <p>Docker + Compose + Ansible + Nginx 的部署实践。</p>
+    <a href="project2.html">→ 查看项目笔记</a>
+</div>
 
-    <div class="project-card">
-        <h2>项目三：IoT 云边协同监控平台</h2>
-        <p>MQTT · InfluxDB · Grafana · 物联网监控</p>
-        <a href="project3.html">进入项目 →</a>
-    </div>
-
+<div class="card">
+    <h3>项目三：物联网云边协同监控平台</h3>
+    <p>MQTT + InfluxDB + Grafana 的 IoT 数据链路。</p>
+    <a href="project3.html">→ 查看项目笔记</a>
 </div>
 
 </body>
