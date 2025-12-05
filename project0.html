@@ -1,29 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <meta charset="utf-8">
-    <title>项目一 · 服务器监控看板</title>
-    <link rel="stylesheet" href="md/page.css">
+    <meta charset="UTF-8">
+    <title>随笔吐槽</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+        nav {
+            background: #333;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        nav a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+        nav a:hover { text-decoration: underline; }
+        #content {
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-    <nav>
-        <a href="/">首页</a>
-        <a href="notes.html">项目集</a>
-    </nav>
-</header>
+<nav>
+    <a href="index.html">首页</a>
+    <a href="notes.html">笔记中心</a>
+    <a href="project1.html">项目一</a>
+    <a href="project2.html">项目二</a>
+    <a href="project3.html">项目三</a>
+</nav>
 
-<div class="container">
-    <h1>一些随笔</h1>
+<h2>随笔吐槽</h2>
+<div id="content">加载中...</div>
 
-    <div id="toc"></div>
-    <div id="content">加载中...</div>
-</div>
-
-<script src="md/markdown.js"></script>
 <script>
-    loadMarkdown("md/project0.md");
+function loadMarkdown() {
+    fetch("md/project0.md")
+        .then(r => r.text())
+        .then(md => {
+            const html = md
+                .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+                .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+                .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+                .replace(/\*\*(.*)\*\*/gim, "<b>$1</b>")
+                .replace(/\*(.*)\*/gim, "<i>$1</i>")
+                .replace(/\n$/gim, "<br>");
+
+            document.getElementById("content").innerHTML = html;
+        });
+}
+
+loadMarkdown();
 </script>
 
 </body>
