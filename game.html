@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>迷宫逃脱 - 我的测试网站</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { margin:0; font-family: "Segoe UI", Arial, sans-serif; background: #111; color: #fff; }
+main { text-align:center; padding:20px; }
+
+canvas { background:#222; display:block; margin: 20px auto; border:2px solid #444; }
+
+.controls { margin-top:10px; display:flex; justify-content:center; gap:15px; flex-wrap:wrap; }
+.controls button { padding:10px 20px; font-size:16px; cursor:pointer; }
+
+.difficulty { margin-top:10px; display:flex; justify-content:center; gap:10px; }
+.difficulty button { padding:5px 15px; font-size:14px; cursor:pointer; }
+
+/* 手机方向按钮 */
+.mobile-controls { display:none; margin-top:15px; gap:10px; justify-content:center; flex-wrap:wrap; }
+.mobile-controls button { width:60px; height:60px; font-size:18px; border-radius:10px; }
+
+@media(max-width:700px){
+  .mobile-controls { display:flex; }
+}
+
+/* 导航跳转按钮 */
+.nav-buttons { display:flex; justify-content:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.nav-buttons button { padding:6px 15px; cursor:pointer; font-size:14px; background:#333; color:#fff; border:none; border-radius:4px; }
+.nav-buttons button:hover { background:#555; }
+</style>
+</head>
+<body>
+<script>
+// 如果未验证过密码，则跳回 secret.html
+if (!sessionStorage.getItem("authenticated")) {
+    window.location.href = "secret.html";
+}
+</script>
+
+<!-- 导航栏 -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('header.html')
+  .then(r => r.text())
+  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
+</script>
+
+<main>
+<h1>迷宫逃脱游戏</h1>
+
+<!-- 页面跳转按钮 -->
+<div class="nav-buttons">
+  <button onclick="location.href='index.html'">首页</button>
+  <button onclick="location.href='mysql.html'">MySQL命令</button>
+  <button onclick="location.href='linux-command-cheatsheet.html'">Linux命令</button>
+  <button onclick="location.href='about.html'">关于</button>
+</div>
+
+<div class="difficulty">
+  <button onclick="setDifficulty(5)">简单（目前存在问题，请选择中等难度）</button>
+  <button onclick="setDifficulty(25)">中等（终点不显示，点一下开始新游戏就好了）</button>
+  <button onclick="setDifficulty(40)">困难（目前存在问题，请选择中等难度）</button>
+</div>
+
+<canvas id="mazeCanvas" width="600" height="600"></canvas>
+
+<div class="controls">
+  <button id="startBtn">开始新游戏</button>
+  <button id="pauseBtn">暂停</button>
+</div>
+
+<div class="mobile-controls">
+  <button onclick="movePlayer(0,-1)">↑</button>
+  <button onclick="movePlayer(0,1)">↓</button>
+  <button onclick="movePlayer(-1,0)">←</button>
+  <button onclick="movePlayer(1,0)">→</button>
+</div>
+</main>
+
+<script>
+const canvas = document.getElementById('mazeCanvas');
+const ctx = canvas.getContext('2d');
+let rows=15, cols=15, cellSize=40;
+let maze=[], player={x:0,y:0}, end={x:0,y:0};
+let paused=false;
+
+// 难度选择
+function setDifficulty(n){
+  rows=cols=n;
+  cellSize = Math.floor(600/n);
+  initGame();
+}
+
+// 初始化游戏
+function initGame(){
+  maze = generateMaze(rows,cols);
+  player={x:0,y:0};
+  end={x:cols-1,y:rows-1};
+  paused=false;
+  drawMaze();
+}
+
+// 迷宫生成（DFS）
+function generateMaze(r,c){
+  let m = Array(r).fill(0).map(()=>Array(c).fill(1));
+  let visited = Array(r).fill(0).map(()=>Array(c).fill(false));
+  function dfs(x,y){
+    visited[y][x]=true;
+    m[y][x]=0;
+    let dirs=[[0,-1],[0,1],[-1,0],[1,0]];
+    dirs.sort(()=>Math.random()-0.5);
+    for(let [dx,dy] of dirs){
+      let nx=x+dx*2, ny=y+dy*2;
+      if(nx>=0 && nx<c && ny>=0 && ny<r && !visited[ny][nx]){
+        m[y+dy][x+dx]=0;
+        dfs(nx,ny);
+      }
+    }
+  }
+  dfs(0,0);
+  m[0][0]=0; m[r-1][c-1]=0;
+  return m;
+}
+
+// 绘制迷宫
+function drawMaze(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      if(maze[y][x]===1){
+        ctx.fillStyle='#555';
+        ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);
+      }
+    }
+  }
+  // 绘制终点（红旗）
+  ctx.fillStyle='red';
+  ctx.beginPath();
+  ctx.moveTo(end.x*cellSize+cellSize*0.3,end.y*cellSize+cellSize*0.2);
+  ctx.lineTo(end.x*cellSize+cellSize*0.7,end.y*cellSize+cellSize*0.5);
+  ctx.lineTo(end.x*cellSize+cellSize*0.3,end.y*cellSize+cellSize*0.8);
+  ctx.closePath();
+  ctx.fill();
+  
+  // 绘制玩家
+  ctx.fillStyle='yellow';
+  ctx.beginPath();
+  ctx.arc(player.x*cellSize+cellSize/2, player.y*cellSize+cellSize/2, cellSize/3,0,2*Math.PI);
+  ctx.fill();
+}
+
+// 移动玩家
+function movePlayer(dx,dy){
+  if(paused) return;
+  let nx=player.x+dx, ny=player.y+dy;
+  if(nx>=0 && nx<cols && ny>=0 && ny<rows && maze[ny][nx]===0){
+    player.x=nx; player.y=ny;
+    drawMaze();
+    if(player.x===end.x && player.y===end.y){
+      alert('🎉恭喜通关！');
+      paused=true;
+    }
+  }
+}
+
+// 键盘控制
+document.addEventListener('keydown',e=>{
+  switch(e.key){
+    case 'ArrowUp': movePlayer(0,-1); break;
+    case 'ArrowDown': movePlayer(0,1); break;
+    case 'ArrowLeft': movePlayer(-1,0); break;
+    case 'ArrowRight': movePlayer(1,0); break;
+  }
+});
+
+// 按钮事件
+document.getElementById('startBtn').addEventListener('click',initGame);
+document.getElementById('pauseBtn').addEventListener('click',()=>{paused=!paused;});
+
+// 自动初始化
+initGame();
+</script>
+
+</body>
+</html>

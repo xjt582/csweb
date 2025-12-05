@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>迷宫逃脱游戏</title>
+<style>
+  body { 
+    font-family: Arial, sans-serif; 
+    background: #111; 
+    color: #fff; 
+    text-align: center; 
+    margin:0; 
+    padding:0;
+  }
+  #controls { margin: 10px; }
+  canvas { 
+    border: 2px solid #fff; 
+    background: #222; 
+    display: block; 
+    margin: 0 auto; 
+  }
+  button { margin: 5px; padding: 8px 15px; font-size: 16px; cursor:pointer;}
+  select { margin: 5px; padding: 5px; font-size: 16px;}
+</style>
+</head>
+<body>
+
+<h1>迷宫逃脱游戏</h1>
+
+<div id="controls">
+  难度：
+  <select id="difficulty">
+    <option value="10">简单</option>
+    <option value="15" selected>中等</option>
+    <option value="20">困难</option>
+  </select>
+  <button id="newGame">开始新游戏</button>
+  <button id="pauseGame">暂停</button>
+</div>
+
+<canvas id="gameCanvas" width="600" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let rows, cols, cellSize;
+let maze = [];
+let player = {x:0,y:0};
+let end = {x:0,y:0};
+let doorImg = new Image();
+doorImg.src = "door.png";
+let keys = {};
+let paused = false;
+let intervalId;
+let moveInterval = 100; // 移动速度(ms)
+
+document.getElementById('difficulty').addEventListener('change',()=>newMaze());
+document.getElementById('newGame').addEventListener('click',()=>newMaze());
+document.getElementById('pauseGame').addEventListener('click',()=>{
+  paused = !paused;
+  document.getElementById('pauseGame').textContent = paused?"继续":"暂停";
+});
+
+function newMaze(){
+  clearInterval(intervalId);
+  rows = cols = parseInt(document.getElementById('difficulty').value);
+  cellSize = canvas.width/cols;
+  maze = generateMaze(rows, cols);
+  player = {x:0,y:0};
+  // 终点放在右下角
+  end = {x:cols-1, y:rows-1};
+  drawMaze();
+  paused = false;
+  document.getElementById('pauseGame').textContent = "暂停";
+  intervalId = setInterval(gameLoop, moveInterval);
+}
+
+// 随机迷宫生成：递归回溯算法
+function generateMaze(r,c){
+  let grid = Array.from({length:r},()=>Array(c).fill(1)); // 1=墙,0=通道
+  let visited = Array.from({length:r},()=>Array(c).fill(false));
+
+  function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+  function carve(x,y){
+    visited[y][x]=true;
+    grid[y][x]=0;
+    let dirs = shuffle([[0,-1],[1,0],[0,1],[-1,0]]);
+    for(let [dx,dy] of dirs){
+      let nx = x+dx*2;
+      let ny = y+dy*2;
+      if(nx>=0 && nx<c && ny>=0 && ny<r && !visited[ny][nx]){
+        grid[y+dy][x+dx]=0;
+        carve(nx,ny);
+      }
+    }
+  }
+  carve(0,0);
+  grid[0][0]=0;
+  grid[r-1][c-1]=0;
+  return grid;
+}
+
+function drawMaze(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      if(maze[y][x]===1){
+        ctx.fillStyle="#555";
+        ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);
+      }
+    }
+  }
+  // 绘制终点
+  if(doorImg.complete){
+    ctx.drawImage(doorImg,end.x*cellSize,end.y*cellSize,cellSize,cellSize);
+  } else {
+    doorImg.onload=()=>drawMaze();
+    ctx.fillStyle="yellow";
+    ctx.fillRect(end.x*cellSize,end.y*cellSize,cellSize,cellSize);
+  }
+  // 绘制玩家
+  ctx.fillStyle="red";
+  ctx.beginPath();
+  ctx.arc(player.x*cellSize+cellSize/2, player.y*cellSize+cellSize/2, cellSize/3,0,Math.PI*2);
+  ctx.fill();
+}
+
+document.addEventListener('keydown',e=>keys[e.key]=true);
+document.addEventListener('keyup',e=>keys[e.key]=false);
+
+function gameLoop(){
+  if(paused) return;
+  let dx=0,dy=0;
+  if(keys['ArrowUp']||keys['w']) dy=-1;
+  if(keys['ArrowDown']||keys['s']) dy=1;
+  if(keys['ArrowLeft']||keys['a']) dx=-1;
+  if(keys['ArrowRight']||keys['d']) dx=1;
+  movePlayer(dx,dy);
+  drawMaze();
+  if(player.x===end.x && player.y===end.y){
+    paused=true;
+    alert("恭喜，你到达终点！");
+  }
+}
+
+function movePlayer(dx,dy){
+  let nx = player.x+dx;
+  let ny = player.y+dy;
+  if(nx>=0 && nx<cols && ny>=0 && ny<rows && maze[ny][nx]===0){
+    player.x=nx;
+    player.y=ny;
+  }
+}
+
+// 初始化
+newMaze();
+</script>
+
+</body>
+</html>

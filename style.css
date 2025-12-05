@@ -1,0 +1,111 @@
+/* ===== 全局样式 ===== */
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+
+/* 滚动条美化 */
+body::-webkit-scrollbar {
+    width: 8px; height: 8px;
+}
+body::-webkit-scrollbar-track { background: transparent; }
+body::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 4px;
+}
+
+/* ===== 导航栏 ===== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2c3e50;
+    padding: 10px 20px;
+    color: #fff;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 999;
+}
+.navbar .logo { font-size: 20px; font-weight: bold; }
+.navbar ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 15px; }
+.navbar ul li a { color: #fff; text-decoration: none; font-size: 15px; }
+.navbar ul li a:hover { text-decoration: underline; }
+
+.menu-btn { display: none; cursor: pointer; font-size: 22px; user-select: none; }
+@media (max-width: 700px) {
+    .navbar ul { display: none; flex-direction: column; background: #34495e; position: absolute; top: 50px; right: 0; width: 180px; padding: 15px; }
+    .navbar ul.active { display: flex; }
+    .menu-btn { display: block; }
+}
+
+/* ===== 主容器 ===== */
+main, .container {
+    max-width: 900px;
+    margin: 100px auto 50px auto; /* 上方留导航栏高度，底部留 footer */
+    padding: 20px;
+    background: #161b22;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+}
+
+/* 标题 & 代码 */
+h1,h2,h3 { color: #58a6ff; }
+pre { background: #0d1117; border-radius: 8px; padding: 1rem; overflow-x: auto; }
+code { font-size: 15px; }
+#toc { background: #161b22; padding: 1rem; border-radius: 10px; margin-bottom: 2rem; }
+#toc a { text-decoration: none; color: #58a6ff; }
+#toc ul { list-style: none; padding-left: 0; }
+#toc li { padding: 4px 0; }
+
+/* 卡片布局 */
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+}
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    width: 220px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+}
+.card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    background: rgba(88, 166, 255, 0.1);
+}
+.card img { width: 50px; height: 50px; margin-bottom: 15px; }
+.card h3 { margin: 10px 0; color: #58a6ff; }
+.card p { font-size: 0.95rem; color: #c9d1d9; }
+
+/* 说明列表 */
+ul.explain { margin-top: 0.5rem; margin-bottom: 2rem; padding-left: 1rem; }
+ul.explain li { margin-bottom: 0.3rem; }
+
+/* 响应式 */
+@media(max-width: 700px){
+    .cards { flex-direction: column; align-items: center; }
+    .card { width: 80%; }
+}
+
+/* footer */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}

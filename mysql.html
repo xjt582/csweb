@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySQL 常用命令速查表</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+<link rel="stylesheet" href="style.css">
+<script src="header.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+<script>
+// 如果未验证过密码，则跳回 secret.html
+if (!sessionStorage.getItem("authenticated")) {
+    window.location.href = "secret.html";
+}
+</script>
+
+<div id="navbar-placeholder"></div>
+
+<div class="container">
+
+<h1>MySQL 常用命令速查表</h1>
+
+<div id="toc">
+<h2>📌 快速导航</h2>
+<ul>
+    <li><a href="#conn">一、连接与退出</a></li>
+    <li><a href="#db">二、数据库操作</a></li>
+    <li><a href="#table">三、数据表操作</a></li>
+    <li><a href="#crud">四、数据增删改查</a></li>
+    <li><a href="#index">五、索引操作</a></li>
+    <li><a href="#user">六、用户权限管理</a></li>
+    <li><a href="#import">七、数据导入导出</a></li>
+    <li><a href="#status">八、系统信息查询</a></li>
+</ul>
+</div>
+
+<hr>
+
+<h2 id="conn">一、连接与退出</h2>
+<pre><code class="language-bash">mysql -u 用户名 -p   # 本地连接 MySQL，会提示输入密码</code></pre>
+<pre><code class="language-bash">mysql -h 主机ip -u 用户名 -p   # 远程连接 MySQL，需要网络和权限</code></pre>
+<pre><code class="language-bash">exit   # 退出 MySQL 客户端，返回系统命令行</code></pre>
+
+<h2 id="db">二、数据库操作</h2>
+<pre><code class="language-sql">show databases;   -- 列出所有数据库，方便查看可用数据库</code></pre>
+<pre><code class="language-sql">create database dbname;   -- 创建新数据库，默认字符集可能是 latin1</code></pre>
+<pre><code class="language-sql">create database dbname character set utf8mb4;   -- 创建数据库并指定字符集为 utf8mb4，支持中文和 emoji</code></pre>
+<pre><code class="language-sql">use dbname;   -- 切换当前操作的数据库</code></pre>
+<pre><code class="language-sql">drop database dbname;   -- 删除整个数据库及其所有表，操作前需确认</code></pre>
+
+<h2 id="table">三、数据表操作</h2>
+<pre><code class="language-sql">show tables;   -- 列出当前数据库所有表</code></pre>
+<pre><code class="language-sql">describe table_name;   -- 查看表字段和类型</code></pre>
+<pre><code class="language-sql">show columns from table_name;   -- 显示表字段信息</code></pre>
+<pre><code class="language-sql">create table students (
+    id int primary key auto_increment,
+    name varchar(50),
+    age int,
+    score float
+);   -- 创建 students 表</code></pre>
+<pre><code class="language-sql">show create table table_name;   -- 查看创建表的完整 SQL</code></pre>
+<pre><code class="language-sql">drop table table_name;   -- 删除表及其数据</code></pre>
+<pre><code class="language-sql">rename table old_name to new_name;   -- 重命名表</code></pre>
+<pre><code class="language-sql">alter table table_name add column_name varchar(50);   -- 添加新列</code></pre>
+<pre><code class="language-sql">alter table table_name drop column_name;   -- 删除列</code></pre>
+<pre><code class="language-sql">alter table table_name modify column_name int;   -- 修改列类型</code></pre>
+
+<h2 id="crud">四、数据增删改查</h2>
+<pre><code class="language-sql">insert into students (name, age, score)
+values ('张三', 18, 95);   -- 插入单行数据</code></pre>
+<pre><code class="language-sql">insert into students (name, age, score)
+values ('李四', 19, 88),
+       ('王五', 20, 92);   -- 插入多行数据</code></pre>
+
+<pre><code class="language-sql">select * from students;   -- 查询所有数据</code></pre>
+<pre><code class="language-sql">select name, age from students;   -- 查询指定字段</code></pre>
+<pre><code class="language-sql">select * from students where age > 18;   -- 条件查询</code></pre>
+<pre><code class="language-sql">select * from students where name like '张%';   -- 模糊查询</code></pre>
+<pre><code class="language-sql">select * from students order by score desc;   -- 按 score 倒序排序</code></pre>
+<pre><code class="language-sql">select * from students limit 5;   -- 返回前5条记录</code></pre>
+<pre><code class="language-sql">select count(*) from students;   -- 统计行数</code></pre>
+<pre><code class="language-sql">select avg(score) from students;   -- 计算平均分</code></pre>
+<pre><code class="language-sql">select age, count(*) from students group by age;   -- 按年龄分组统计数量</code></pre>
+<pre><code class="language-sql">select age, count(*) from students group by age having count(*) > 2;   -- 分组过滤</code></pre>
+
+<pre><code class="language-sql">update students set score = 98 where name = '张三';   -- 更新指定字段</code></pre>
+<pre><code class="language-sql">update students set age = 20, score = 90 where id = 1;   -- 更新多字段</code></pre>
+
+<pre><code class="language-sql">delete from students where id = 5;   -- 删除指定行</code></pre>
+<pre><code class="language-sql">delete from students;   -- 删除所有数据，但保留表结构</code></pre>
+<pre><code class="language-sql">truncate table students;   -- 清空表数据（速度更快）</code></pre>
+
+<h2 id="index">五、索引操作</h2>
+<pre><code class="language-sql">create index idx_name on students(name);   -- 创建索引，加快查询</code></pre>
+<pre><code class="language-sql">show index from students;   -- 查看表索引信息</code></pre>
+<pre><code class="language-sql">drop index idx_name on students;   -- 删除索引</code></pre>
+
+<h2 id="user">六、用户权限管理</h2>
+<pre><code class="language-sql">create user 'user1'@'%' identified by 'password';   -- 创建新用户</code></pre>
+<pre><code class="language-sql">grant all privileges on dbname.* to 'user1'@'%';   -- 授予权限</code></pre>
+<pre><code class="language-sql">flush privileges;   -- 刷新权限，使修改生效</code></pre>
+<pre><code class="language-sql">drop user 'user1'@'%';   -- 删除用户</code></pre>
+
+<h2 id="import">七、数据导入导出</h2>
+<pre><code class="language-bash">mysqldump -u root -p dbname > backup.sql   -- 导出数据库到文件</code></pre>
+<pre><code class="language-bash">mysql -u root -p dbname < backup.sql   -- 从文件导入数据库</code></pre>
+
+<h2 id="status">八、系统信息查询</h2>
+<pre><code class="language-sql">select database();   -- 当前所在数据库</code></pre>
+<pre><code class="language-sql">select version();   -- MySQL 版本</code></pre>
+<pre><code class="language-sql">select user();   -- 当前用户</code></pre>
+
+</div>
+<footer>© 2025 我的测试网站</footer>
+</body>
+</html>
