@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首页 - 我的测试网站</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script>
+// 如果未验证过密码，则跳回 secret.html
+if (!sessionStorage.getItem("authenticated")) {
+    window.location.href = "secret.html";
+}
+</script>
+
+<!-- 导航栏 -->
+<div id="navbar-placeholder"></div>
+<script>
+fetch('header.html')
+  .then(r => r.text())
+  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
+</script>
+
+<main>
+    <h1>欢迎来到我的测试网站</h1>
+    <p>这里收集了常用 MySQL 命令、Linux 命令以及小游戏，方便学习和娱乐。</p>
+
+    <div class="cards">
+        <a href="mysql.html" class="card">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/database.png" alt="MySQL">
+            <h3>MySQL 操作指南</h3>
+            <p>快速查找和学习常用 MySQL 数据库操作命令。</p>
+        </a>
+
+        <a href="linux-command-cheatsheet.html" class="card">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/console.png" alt="Linux">
+            <h3>Linux 命令速查表</h3>
+            <p>收集常用 Linux 系统命令，便于运维和开发参考。</p>
+        </a>
+        <a href="notes.html" class="card">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/notepad.png" alt="笔记图标">
+            <h3>我的学习笔记</h3>
+            <p>从本地到云服务器的过程</p >
+        </a >
+
+        <a href="chat.html" class="card">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/chat-message.png" alt="聊天图标">
+        <h3>情感树洞</h3>
+        <p>有问题随时来吐槽，所有内容最多保留24小时。</p >
+        </a >
+
+        <a href="game.html" class="card">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/flag.png" alt="Game">
+            <h3>迷宫逃脱游戏</h3>
+            <p>挑战随机迷宫，看看你能否顺利逃脱！</p>
+        </a>
+
+        <a href="about.html" class="card">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/info.png" alt="About">
+            <h3>关于本站</h3>
+            <p>了解本站的使用说明和联系方式。</p>
+        </a>
+    </div>
+</main>
+
+</body>
+</html>

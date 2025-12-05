@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>情感树洞</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(120deg, #fdfbfb, #ebedee);
+    color: #333;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 25px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    border-radius: 15px;
+    position: relative;
+    z-index: 2; /* 保证在叶子上层 */
+}
+
+h2 {
+    text-align: center;
+    color: #4a4a4a;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+textarea {
+    width: 100%;
+    height: 90px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    resize: none;
+    font-size: 14px;
+}
+
+textarea:focus {
+    border-color: #6c63ff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(108, 99, 255, 0.3);
+}
+
+button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #6c63ff, #8e7ffe);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #8e7ffe, #6c63ff);
+    transform: translateY(-2px);
+}
+
+/* 消息卡片（树叶） */
+.msg {
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-top: 15px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+    color: #fff;
+}
+
+/* 时间显示 */
+.msg .time {
+    font-size: 12px;
+    color: #eee;
+    text-align: right;
+    margin-top: 6px;
+}
+
+/* 落叶样式 */
+.leaf {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #6DBE45, #4CAF50);
+    position: fixed;
+    top: -50px;
+    border-radius: 50%;
+    opacity: 0.8;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(0deg);
+    animation: fall linear infinite;
+}
+
+/* 落叶动画 */
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🌿 情感树洞</h2>
+
+    <textarea id="input" placeholder="写下你的心情…"></textarea>
+    <button onclick="postMessage()">发送</button>
+
+    <div id="messages"></div>
+</div>
+
+<script>
+// 随机绿色渐变消息背景
+function randomLeafColor() {
+    const greens = [
+        ['#6DBE45','#4CAF50'],
+        ['#8BC34A','#AED581'],
+        ['#43A047','#66BB6A'],
+        ['#81C784','#388E3C'],
+        ['#A5D6A7','#2E7D32']
+    ];
+    const choice = greens[Math.floor(Math.random()*greens.length)];
+    return `linear-gradient(135deg, ${choice[0]}, ${choice[1]})`;
+}
+
+// 生成落叶元素
+function createLeaf() {
+    const leaf = document.createElement('div');
+    leaf.className = 'leaf';
+    leaf.style.left = Math.random() * window.innerWidth + 'px';
+    leaf.style.animationDuration = 5 + Math.random()*5 + 's';
+    leaf.style.width = 15 + Math.random()*15 + 'px';
+    leaf.style.height = 15 + Math.random()*15 + 'px';
+    leaf.style.background = `linear-gradient(135deg, #${Math.floor(Math.random()*0x567800 + 0x449900).toString(16)}, #${Math.floor(Math.random()*0x99cc33 + 0x66aa00).toString(16)})`;
+    document.body.appendChild(leaf);
+    setTimeout(()=> leaf.remove(), parseFloat(leaf.style.animationDuration)*1000);
+}
+
+// 每隔 0.7 秒随机生成一片叶子
+setInterval(createLeaf, 500);
+
+// 加载消息
+async function loadMessages() {
+    try {
+        const res = await fetch("/submit.php?action=list&_=" + Date.now());
+        const msgs = await res.json();
+
+        const box = document.getElementById("messages");
+        box.innerHTML = "";
+
+        // 逆序渲染，让最新消息在最上方
+        msgs.slice().reverse().forEach(m => {
+            const div = document.createElement("div");
+            div.className = "msg";
+            div.style.background = randomLeafColor();
+
+            const textDiv = document.createElement("div");
+            textDiv.textContent = m.text;
+            div.appendChild(textDiv);
+
+            const timeDiv = document.createElement("div");
+            timeDiv.className = "time";
+            timeDiv.textContent = new Date(m.time * 1000).toLocaleString();
+            div.appendChild(timeDiv);
+
+            box.appendChild(div);
+        });
+    } catch (err) {
+        console.error("加载消息失败:", err);
+    }
+}
+
+
+// 发送消息
+async function postMessage() {
+    const text = document.getElementById("input").value.trim();
+    if (!text) return;
+
+    try {
+        const res = await fetch("/submit.php?action=add", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "text=" + encodeURIComponent(text)
+        });
+
+        const data = await res.json();
+        if(data.success){
+            document.getElementById("input").value = "";
+            loadMessages();
+        } else {
+            console.error("写入失败", data);
+        }
+
+    } catch (err) {
+        console.error("发送消息失败:", err);
+    }
+}
+
+// 初始加载
+loadMessages();
+</script>
+
+</body>
+</html>

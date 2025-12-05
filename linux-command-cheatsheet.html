@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Linux 常用命令速查表</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+<link rel="stylesheet" href="style.css">
+<script src="header.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+<script>
+// 如果未验证过密码，则跳回 secret.html
+if (!sessionStorage.getItem("authenticated")) {
+    window.location.href = "secret.html";
+}
+</script>
+
+<div id="navbar-placeholder"></div>
+
+<div class="container">
+<h1>Linux 常用命令速查表</h1>
+
+<div id="toc">
+<h2>📌 快速导航</h2>
+<ul>
+    <li><a href="#file">一、文件与目录操作</a></li>
+    <li><a href="#view">二、查看文件内容</a></li>
+    <li><a href="#sys">三、系统信息与性能监控</a></li>
+    <li><a href="#net">四、网络命令</a></li>
+    <li><a href="#user">五、用户与权限管理</a></li>
+    <li><a href="#pkg">六、软件包管理（APT / YUM）</a></li>
+    <li><a href="#service">七、服务管理 systemctl</a></li>
+    <li><a href="#disk">八、磁盘管理</a></li>
+    <li><a href="#archive">九、压缩与解压</a></li>
+    <li><a href="#process">十、进程管理</a></li>
+</ul>
+</div>
+
+<hr>
+
+<h2 id="file">一、文件与目录操作</h2>
+<pre><code class="language-bash">ls                # 列出目录</code></pre>
+<pre><code class="language-bash">ls -l             # 列出详细信息</code></pre>
+<pre><code class="language-bash">ls -a             # 显示隐藏文件</code></pre>
+<pre><code class="language-bash">pwd               # 显示当前目录路径</code></pre>
+<pre><code class="language-bash">cd /path          # 进入指定目录</code></pre>
+<pre><code class="language-bash">cd ..             # 回到上一级目录</code></pre>
+<pre><code class="language-bash">cd ~              # 回到用户主目录</code></pre>
+<pre><code class="language-bash">cp file1 file2    # 复制文件</code></pre>
+<pre><code class="language-bash">cp -r dir1 dir2   # 复制目录</code></pre>
+<pre><code class="language-bash">mv old new        # 重命名/移动文件</code></pre>
+<pre><code class="language-bash">rm file           # 删除文件</code></pre>
+<pre><code class="language-bash">rm -r dir         # 删除目录（慎用）</code></pre>
+<pre><code class="language-bash">rm -rf dir        # 强制删除目录（危险操作）</code></pre>
+<pre><code class="language-bash">mkdir dir         # 创建目录</code></pre>
+<pre><code class="language-bash">touch file        # 创建空文件</code></pre>
+
+<h2 id="view">二、查看文件内容</h2>
+<pre><code class="language-bash">cat file          # 查看文件全部内容</code></pre>
+<pre><code class="language-bash">tac file          # 倒序显示文件</code></pre>
+<pre><code class="language-bash">more file         # 分页显示文件内容</code></pre>
+<pre><code class="language-bash">less file         # 可上下滚动查看内容</code></pre>
+<pre><code class="language-bash">head file         # 查看前10行</code></pre>
+<pre><code class="language-bash">head -n 20 file   # 查看前20行</code></pre>
+<pre><code class="language-bash">tail file         # 查看后10行</code></pre>
+<pre><code class="language-bash">tail -f file      # 实时查看日志文件</code></pre>
+
+<h2 id="sys">三、系统信息与性能监控</h2>
+<pre><code class="language-bash">top               # 实时系统监控</code></pre>
+<pre><code class="language-bash">htop              # 彩色进程监控（需安装）</code></pre>
+<pre><code class="language-bash">vmstat 1          # 内存/进程监控</code></pre>
+<pre><code class="language-bash">free -h           # 查看内存使用情况</code></pre>
+<pre><code class="language-bash">uname -a          # 查看系统版本信息</code></pre>
+<pre><code class="language-bash">hostname          # 查看主机名</code></pre>
+<pre><code class="language-bash">df -h             # 查看磁盘使用情况</code></pre>
+<pre><code class="language-bash">du -sh dir        # 查看目录大小</code></pre>
+<pre><code class="language-bash">uptime            # 查看开机时长和负载</code></pre>
+<pre><code class="language-bash">who               # 查看在线用户</code></pre>
+
+<h2 id="net">四、网络命令</h2>
+<pre><code class="language-bash">ping baidu.com    # 测试连通性</code></pre>
+<pre><code class="language-bash">curl ipinfo.io    # 获取公网 IP</code></pre>
+<pre><code class="language-bash">ifconfig          # 查看 IP（旧命令）</code></pre>
+<pre><code class="language-bash">ip a              # 查看 IP（推荐）</code></pre>
+<pre><code class="language-bash">netstat -tunlp    # 查看端口占用</code></pre>
+<pre><code class="language-bash">ss -tunlp         # 查看端口占用（更快）</code></pre>
+<pre><code class="language-bash">traceroute host   # 路由追踪（需安装）</code></pre>
+<pre><code class="language-bash">nslookup domain   # 域名查询</code></pre>
+<pre><code class="language-bash">dig domain        # DNS 查询（需安装）</code></pre>
+<pre><code class="language-bash">wget URL          # 下载文件</code></pre>
+<pre><code class="language-bash">curl URL          # 获取网页内容</code></pre>
+
+<h2 id="user">五、用户与权限管理</h2>
+<pre><code class="language-bash">useradd user      # 创建新用户</code></pre>
+<pre><code class="language-bash">passwd user       # 设置用户密码</code></pre>
+<pre><code class="language-bash">userdel user      # 删除用户</code></pre>
+<pre><code class="language-bash">groupadd group    # 创建用户组</code></pre>
+<pre><code class="language-bash">chown user file   # 修改文件所有者</code></pre>
+<pre><code class="language-bash">chown user:group file   # 修改所有者和组</code></pre>
+<pre><code class="language-bash">chmod 755 file    # 设置权限</code></pre>
+<pre><code class="language-bash">chmod u+rwx file  # 添加权限</code></pre>
+
+<h2 id="pkg">六、软件包管理</h2>
+<h3>Debian/Ubuntu (APT)</h3>
+<pre><code class="language-bash">apt update        # 更新软件源</code></pre>
+<pre><code class="language-bash">apt upgrade       # 升级已安装软件</code></pre>
+<pre><code class="language-bash">apt install pkg   # 安装软件包</code></pre>
+<pre><code class="language-bash">apt remove pkg    # 卸载软件包</code></pre>
+<pre><code class="language-bash">apt purge pkg     # 完全删除软件包</code></pre>
+
+<h3>CentOS/RHEL (YUM/DNF)</h3>
+<pre><code class="language-bash">yum install pkg   # 安装软件包</code></pre>
+<pre><code class="language-bash">yum remove pkg    # 卸载软件包</code></pre>
+<pre><code class="language-bash">yum update        # 升级软件包</code></pre>
+
+<h2 id="service">七、服务管理 systemctl</h2>
+<pre><code class="language-bash">systemctl start service     # 启动服务</code></pre>
+<pre><code class="language-bash">systemctl stop service      # 停止服务</code></pre>
+<pre><code class="language-bash">systemctl restart service   # 重启服务</code></pre>
+<pre><code class="language-bash">systemctl status service    # 查看服务状态</code></pre>
+<pre><code class="language-bash">systemctl enable service    # 开机启动</code></pre>
+<pre><code class="language-bash">systemctl disable service   # 禁用开机自动启动</code></pre>
+
+<h2 id="disk">八、磁盘管理</h2>
+<pre><code class="language-bash">lsblk              # 查看磁盘结构</code></pre>
+<pre><code class="language-bash">fdisk -l           # 查看磁盘分区</code></pre>
+<pre><code class="language-bash">mount /dev/sdX /mnt # 挂载磁盘</code></pre>
+<pre><code class="language-bash">umount /mnt        # 卸载磁盘</code></pre>
+
+<h2 id="archive">九、压缩与解压</h2>
+<pre><code class="language-bash">tar -czvf file.tar.gz dir   # 压缩文件夹</code></pre>
+<pre><code class="language-bash">tar -xzvf file.tar.gz       # 解压 tar.gz 文件</code></pre>
+<pre><code class="language-bash">zip file.zip file           # 压缩文件</code></pre>
+<pre><code class="language-bash">unzip file.zip              # 解压文件</code></pre>
+
+<h2 id="process">十、进程管理</h2>
+<pre><code class="language-bash">ps aux             # 查看所有进程</code></pre>
+<pre><code class="language-bash">ps -ef             # 查看进程列表（另一种格式）</code></pre>
+<pre><code class="language-bash">kill PID           # 终止进程</code></pre>
+<pre><code class="language-bash">kill -9 PID        # 强制终止进程（慎用）</code></pre>
+<pre><code class="language-bash">pgrep nginx        # 查找进程 PID</code></pre>
+<pre><code class="language-bash">pkill nginx        # 终止进程</code></pre>
+
+</div>
+<footer>© 2025 我的测试网站</footer>
+</body>
+</html>
